@@ -1,0 +1,33 @@
+{
+  "Set": "Evolving Skies",
+  "Rates": [
+    {
+      "Rarity" :"Rare",
+      "Chance" : 49
+    },
+    {
+      "Rarity" :"Rare Holo",
+      "Chance" : 24
+    },
+    {
+      "Rarity" :"Rare Holo V",
+      "Chance" : 15
+    },
+    {
+      "Rarity" :"Rare Holo VMAX",
+      "Chance" : 6
+    },
+    {
+      "Rarity" :"Rare Ultra",
+      "Chance" : 3
+    },
+    {
+      "Rarity" :"Rare Rainbow",
+      "Chance" : 2
+    },
+    {
+      "Rarity" :"Rare Secret",
+      "Chance" : 1
+    },
+  ]
+}
