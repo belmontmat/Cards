@@ -6,7 +6,7 @@ import Pullrates from "./PullRates.json";
 export default App;
 
 const PokemonCard = ({ data }) => (
-  <tr key={data.id}>
+  <tr>
     <td>{data.cardmarket.prices.averageSellPrice}</td>
     <td>{data.images.large}</td>
   </tr>
@@ -32,18 +32,17 @@ function App() {
   }
 
   //Make this only make one of each const per session, maybe save a cookie or local temp file
-  function breakPack(setName) {
+  async function breakPack(setName) {
     // THIS IS ONLY FOR MAIN MODERN SETS Ex. Evolving Skies
 
-    const commonSet = [fetchCards(setName, "Common")];
-    console.log("common set: "+commonSet[0]);
+    const commonSet = await fetchCards(setName, "Common");
+    console.log("common set: " + commonSet);
     const commonLength = commonSet.length;
-    console.log('common length: ' + commonLength);
-    const uncommonSet =  [fetchCards(setName, "Uncommon")];
+    const uncommonSet = await fetchCards(setName, "Uncommon");
     const uncommonLength =  uncommonSet.length;
-    const rareSet =  [fetchCards(setName, "Rare")];
+    const rareSet =  await fetchCards(setName, "Rare");
     const rareLength = rareSet.length;
-    const hrareSet =  [fetchCards(setName, "Rare Holo")];
+    const hrareSet =  await fetchCards(setName, "Rare Holo");
     const hrareLength = hrareSet.length;
     // ROLL FOR RARITY(roll 1 to 100 inclusive,[1 to rare]= rare,[rare+1 to rare + rareh] = rare holo,[Σrareh+1 to Σv] = v, [Σv+1 to Σvmax] = vmax, [Σvmax+1 to Σultra] = ultra, [Σultra+1 to Σrainbow] = rainbow,[Σrainbow+1 to Σsecret] = secret)
     var rarity = getRandomIntInclusive(1, 100);
@@ -61,19 +60,21 @@ function App() {
       }
     });
 
-    const reverseSet = new Set();
-    uncommonSet.forEach(elem => reverseSet.add(elem));
-    commonSet.forEach(elem => reverseSet.add(elem));
-    rareSet.forEach(elem => reverseSet.add(elem));
-    hrareSet.forEach(elem => reverseSet.add(elem));
-    const reverseLength = reverseSet.size;
+    const reverseSet = [];
+    uncommonSet.forEach(elem => reverseSet.push(elem));
+    commonSet.forEach(elem => reverseSet.push(elem));
+    rareSet.forEach(elem => reverseSet.push(elem));
+    hrareSet.forEach(elem => reverseSet.push(elem));
+    const reverseLength = reverseSet.length;
 
-    var pack = new Set();
+    var pack = [];
     for (var i = 0; i < 5; i++) {
       var rand = getRandomIntInclusive(0, commonLength - 1);
       console.log("rand:" + rand +",common rand:"+commonSet[rand]);
-      if(!pack.has(commonSet[rand])) {
-        pack.add(commonSet[rand]);
+      if(!pack.includes(commonSet[rand])) {
+        pack[i]= {id:"common " + i,
+                  card:commonSet[rand]
+        };
         continue;
       } else {
         console.log("duplicate");
@@ -82,36 +83,43 @@ function App() {
     }
 
     for (var j = 0; j < 3; j++) {
-      if(pack.add(uncommonSet[getRandomIntInclusive(0, uncommonLength - 1)])) {
+      rand = getRandomIntInclusive(0, uncommonLength - 1);
+      console.log("rand:" + rand +",uncommon rand:"+uncommonSet[rand]);
+      if(!pack.includes(uncommonSet[rand])) {
+        pack[i+j]= {id:"uncommon " + j,
+                  card:uncommonSet[rand]
+        };
         continue;
       } else {
         console.log("duplicate");
-        i--;
+        //i--;
       }
     }
 
-    var reverse = (reverseSet[getRandomIntInclusive(0, reverseLength-1)]);
+    pack.push({id:"reverse", card:reverseSet[getRandomIntInclusive(0, reverseLength-1)]});
 
     if(hitRarity === "Rare") {
-      pack.add(rareSet[getRandomIntInclusive(0, rareLength-1)])
+      pack.push({id:"hit", card:rareSet[getRandomIntInclusive(0, rareLength-1)]})
     } else if (hitRarity === "Rare Holo") {
-      pack.add(hrareSet[getRandomIntInclusive(0, hrareLength-1)])
+      pack.push({id:"hit", card:hrareSet[getRandomIntInclusive(0, hrareLength-1)]})
     } else {
-      var hitSet =  [fetchCards(setName, hitRarity)];
+      var hitSet =  await fetchCards(setName, hitRarity);
       var hitLength = hitSet.length;
-      pack.add(hitSet[getRandomIntInclusive(0, hitLength-1)])
+      pack.push({id:"hit", card:hitSet[getRandomIntInclusive(0, hitLength-1)]})
     }
-    console.log("pack0:"+pack[0]);
-    console.log("reverse:"+reverse);
-    return [pack, reverse];
+    console.log("pack: " + pack);
+    return pack;
   }
 
 
   function fetchCards(setName, rarity) {
-    fetch('https://api.pokemontcg.io/v2/cards?q=!set.name:"'+setName+'" !rarity:"'+rarity+'"')
+    return fetch('https://api.pokemontcg.io/v2/cards?q=!set.name:"'+setName+'" !rarity:"'+rarity+'"')
       .then(checkStatus)
       .then(resp => resp.json())
-      .then(json => {return json.data;})
+      .then((responseData) => {
+      console.log(responseData);
+      return responseData.data;
+      })
       .catch(console.error);
   }
 
@@ -123,13 +131,13 @@ function App() {
     return response;
   }
 
-  const [pack, packSet] = React.useState([]);
+  var pack = [];
   var setName = "Evolving Skies";
 
   return (
     <div>
       <h1 className="title">Open {setName}</h1>
-      <button onClick = {() => packSet(breakPack(setName))}>Open a Pack</button>
+      <button onClick = {async () => {pack = await breakPack(setName);  console.log(pack);}}>Open a Pack</button>
       <table width="100%">
         <thead>
         <tr>
@@ -138,9 +146,9 @@ function App() {
         </tr>
         </thead>
         <tbody>
-          {pack.map((pack) => (
-            <PokemonCard data = {pack}/>
-          ))}
+          {pack.map((card) =>
+            <PokemonCard data = {card} key={card.id}/>
+          )}
         </tbody>
       </table>
     </div>
