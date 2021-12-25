@@ -1,29 +1,34 @@
 import React from "react";
-import PropTypes from "prop-types";
+//import PropTypes from "prop-types";
 
 import "./App.css";
 import Pullrates from "./PullRates.json";
 export default App;
 
+/*
 const PokemonCard = ({ data }) => (
   <tr>
-    <td>{data.cardmarket.prices.averageSellPrice}</td>
-    <td>{data.images.large}</td>
+    <td>{data.card.tcgplayer.prices.normal.mid}</td>
+    <td>{data.card.images.large}</td>
   </tr>
 );
 
 PokemonCard.propTypes = {
-  id: PropTypes.string,
-  cardmarket: PropTypes.shape({
-    prices: PropTypes.shape({
-      averageSellPrice: PropTypes.number,
+  card: PropTypes.shape({
+    id: PropTypes.string,
+    images: PropTypes.shape({
+      large: PropTypes.string,
+    }),
+    tcgplayer: PropTypes.shape({
+      prices: PropTypes.shape({
+        normal: PropTypes.shape({
+          mid: PropTypes.number,
+        }),
+      }),
     }),
   }),
-  images: PropTypes.shape({
-    large: PropTypes.string,
-  }),
 };
-
+*/
 function App() {
   function getRandomIntInclusive(min, max) {
     min = Math.ceil(min);
@@ -36,7 +41,6 @@ function App() {
     // THIS IS ONLY FOR MAIN MODERN SETS Ex. Evolving Skies
 
     const commonSet = await fetchCards(setName, "Common");
-    console.log("common set: " + commonSet);
     const commonLength = commonSet.length;
     const uncommonSet = await fetchCards(setName, "Uncommon");
     const uncommonLength =  uncommonSet.length;
@@ -70,7 +74,7 @@ function App() {
     var pack = [];
     for (var i = 0; i < 5; i++) {
       var rand = getRandomIntInclusive(0, commonLength - 1);
-      console.log("rand:" + rand +",common rand:"+commonSet[rand]);
+      console.log("rand#:" + rand + ", set:common, card:"+JSON.stringify(commonSet[rand]));
       if(!pack.includes(commonSet[rand])) {
         pack[i]= {id:"common " + i,
                   card:commonSet[rand]
@@ -78,13 +82,13 @@ function App() {
         continue;
       } else {
         console.log("duplicate");
-        //i--;
+        i--;
       }
     }
 
     for (var j = 0; j < 3; j++) {
       rand = getRandomIntInclusive(0, uncommonLength - 1);
-      console.log("rand:" + rand +",uncommon rand:"+uncommonSet[rand]);
+      console.log("rand:" + rand +", set:uncommon, card:"+JSON.stringify(uncommonSet[rand]));
       if(!pack.includes(uncommonSet[rand])) {
         pack[i+j]= {id:"uncommon " + j,
                   card:uncommonSet[rand]
@@ -92,11 +96,12 @@ function App() {
         continue;
       } else {
         console.log("duplicate");
-        //i--;
+        i--;
       }
     }
-
-    pack.push({id:"reverse", card:reverseSet[getRandomIntInclusive(0, reverseLength-1)]});
+    var reverse = reverseSet[getRandomIntInclusive(0, reverseLength-1)];
+    console.log("reverse card:"+JSON.stringify(reverse));
+    pack.push({id:"reverse", card:reverse});
 
     if(hitRarity === "Rare") {
       pack.push({id:"hit", card:rareSet[getRandomIntInclusive(0, rareLength-1)]})
@@ -107,7 +112,8 @@ function App() {
       var hitLength = hitSet.length;
       pack.push({id:"hit", card:hitSet[getRandomIntInclusive(0, hitLength-1)]})
     }
-    console.log("pack: " + pack);
+    console.log("hit card:" + JSON.stringify(pack[pack.length - 1]));
+    //console.log("pack: " + JSON.stringify(pack));
     return pack;
   }
 
@@ -131,24 +137,39 @@ function App() {
     return response;
   }
 
-  var pack = [];
+  var [pack, packSet] = React.useState([]);
   var setName = "Evolving Skies";
+  var version = "normal";
 
   return (
     <div>
       <h1 className="title">Open {setName}</h1>
-      <button onClick = {async () => {pack = await breakPack(setName);  console.log(pack);}}>Open a Pack</button>
+      <button onClick = {async () => {packSet(await breakPack(setName)); console.log(pack);}}>Open a Pack</button>
       <table width="100%">
         <thead>
-        <tr>
-          <th>Price</th>
-          <th>Image</th>
-        </tr>
+          <tr>
+            <th>Price</th>
+            <th>Image</th>
+          </tr>
         </thead>
         <tbody>
-          {pack.map((card) =>
-            <PokemonCard data = {card} key={card.id}/>
-          )}
+          {pack.map((data) => {
+            if(data.id.includes("reverse")){
+              version = "reverseHolofoil";
+          } else if(data.id.includes("hit")) {
+            if (data.id.includes("Holo") || data.id.includes("Rainbow") || data.id.includes("Ultra") || data.id.includes("Secret")) {
+              version = "holofoil";
+            }
+          } else {
+            version = "normal";
+          }
+          //console.log(pack[9].card.tcgplayer.prices[version]);
+          return (
+            <tr key={data.id}>
+              <td>{data.card.tcgplayer.prices[version].market}</td>
+              <td>{data.card.images.large}</td>
+            </tr>
+          )})}
         </tbody>
       </table>
     </div>
