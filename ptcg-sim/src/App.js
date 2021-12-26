@@ -144,12 +144,13 @@ function App() {
   return (
     <div>
       <h1 className="title">Open {setName}</h1>
-      <button onClick = {async () => {packSet(await breakPack(setName)); console.log(pack);}}>Open a Pack</button>
+      <button onClick = {async () => {packSet(await breakPack(setName))}}>Open a Pack</button>
       <table width="100%">
         <thead>
           <tr>
+            <th>Name</th>
             <th>Price</th>
-            <th>Image</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -157,17 +158,20 @@ function App() {
             if(data.id.includes("reverse")){
               version = "reverseHolofoil";
           } else if(data.id.includes("hit")) {
-            if (data.id.includes("Holo") || data.id.includes("Rainbow") || data.id.includes("Ultra") || data.id.includes("Secret")) {
+            if (data.card.rarity.includes("Holo") || data.card.rarity.includes("Rainbow") || data.card.rarity.includes("Ultra") || data.card.rarity.includes("Secret")) {
               version = "holofoil";
+            } else {
+              version = "normal";
             }
           } else {
             version = "normal";
           }
-          //console.log(pack[9].card.tcgplayer.prices[version]);
+          console.log(data.id + ", " +version);
           return (
             <tr key={data.id}>
+              <td>{data.card.name}</td>
               <td>{data.card.tcgplayer.prices[version].market}</td>
-              <td>{data.card.images.large}</td>
+              <td><img src={data.card.images.small}></img></td>
             </tr>
           )})}
         </tbody>
