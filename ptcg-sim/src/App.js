@@ -121,7 +121,6 @@ function App() {
       pack.push({id:"hit", card:hitSet[getRandomIntInclusive(0, hitLength-1)]})
     }
     console.log("hit card:" + JSON.stringify(pack[pack.length - 1]));
-    //console.log("pack: " + JSON.stringify(pack));
     return pack;
   }
 
@@ -144,24 +143,40 @@ function App() {
     return response;
   }
 
-  function handleSubmit(e, func) {
+  function handleSet(e, func) {
     setSet(e.target.value);
   }
 
   var [pack, packSet] = React.useState([]);
   var version = "normal";
   var [seti, setSet] = React.useState("Evolving Skies");
+  var [money, moneySet] = React.useState(100.0);
+  const firstUpdate = React.useRef(true);
+
+  React.useEffect(() => {
+    if(!firstUpdate.current) {
+      var gain = 0;
+      pack.forEach((item, i) => {
+        if(item.id.includes("reverse")){ gain += item.card.tcgplayer.prices.reverseHolofoil.market;}
+        else if(item.card.rarity.includes("Holo") || item.card.rarity.includes("Rainbow") || item.card.rarity.includes("Ultra") || item.card.rarity.includes("Secret")){gain += item.card.tcgplayer.prices.holofoil.market;}
+        else{gain += item.card.tcgplayer.prices.normal.market;}
+      });
+      console.log("net value="+(gain-4));
+      moneySet(money+gain-4);
+    }
+  }, [pack]);
 
   return (
     <div>
     <label htmlFor="setinput">Choose a set:</label>
 
-    <select name="setinput" id="setinput" defaultValue={seti} onChange={handleSubmit}>
+    <select name="setinput" id="setinput" defaultValue={seti} onChange={handleSet}>
       <option value="Evolving Skies">Evolving Skies</option>
       <option value="Fusion Strike">Fusion Strike</option>
     </select>
       <h1 className="title">Open {seti}</h1>
-      <button onClick = {async () => {packSet(await breakPack(seti))}}>Open a Pack</button>
+      <h3>You have ${money}</h3>
+      <button onClick = {async () => {packSet(await breakPack(seti)); firstUpdate.current = false;}}>Open a Pack for $4</button>
       <table width="100%">
         <thead>
         </thead>
@@ -169,20 +184,20 @@ function App() {
           {pack.map((data) => {
             if(data.id.includes("reverse")){
               version = "reverseHolofoil";
-          } else if(data.id.includes("hit")) {
-            if (data.card.rarity.includes("Holo") || data.card.rarity.includes("Rainbow") || data.card.rarity.includes("Ultra") || data.card.rarity.includes("Secret")) {
-              version = "holofoil";
+            } else if(data.id.includes("hit")) {
+              if (data.card.rarity.includes("Holo") || data.card.rarity.includes("Rainbow") || data.card.rarity.includes("Ultra") || data.card.rarity.includes("Secret")) {
+                version = "holofoil";
+              } else {
+                version = "normal";
+              }
             } else {
               version = "normal";
             }
-          } else {
-            version = "normal";
-          }
           return (
             <tr key={data.id}>
               <td>
                 <p>{data.id}</p>
-                <img alt={"reverse-"+data.card.id} src={data.card.images.small}></img>
+                <img alt={data.card.id} src={data.card.images.small}></img>
                 <p>${data.card.tcgplayer.prices[version].market}</p>
               </td>
             </tr>
