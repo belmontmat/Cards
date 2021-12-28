@@ -144,14 +144,24 @@ function App() {
     return response;
   }
 
+  function handleSubmit(e, func) {
+    setSet(e.target.value);
+  }
+
   var [pack, packSet] = React.useState([]);
-  var setName = "Evolving Skies";
   var version = "normal";
+  var [seti, setSet] = React.useState("Evolving Skies");
 
   return (
     <div>
-      <h1 className="title">Open {setName}</h1>
-      <button onClick = {async () => {packSet(await breakPack(setName))}}>Open a Pack</button>
+    <label htmlFor="setinput">Choose a set:</label>
+
+    <select name="setinput" id="setinput" defaultValue={seti} onChange={handleSubmit}>
+      <option value="Evolving Skies">Evolving Skies</option>
+      <option value="Fusion Strike">Fusion Strike</option>
+    </select>
+      <h1 className="title">Open {seti}</h1>
+      <button onClick = {async () => {packSet(await breakPack(seti))}}>Open a Pack</button>
       <table width="100%">
         <thead>
         </thead>
