@@ -173,6 +173,11 @@ function App() {
     <select name="setinput" id="setinput" defaultValue={seti} onChange={handleSet}>
       <option value="Evolving Skies">Evolving Skies</option>
       <option value="Fusion Strike">Fusion Strike</option>
+      <option value="Vivid Voltage">Vivid Voltage</option>
+      <option value="Darkness Ablaze">Darkness Ablaze</option>
+      <option value="Chilling Reign">Chilling Reign</option>
+      <option value="Battle Styles">Battle Styles</option>
+      <option value="Rebel Clash">Rebel Clash</option>
     </select>
       <h1 className="title">Open {seti}</h1>
       <h3>You have ${money}</h3>
