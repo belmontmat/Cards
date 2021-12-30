@@ -2,6 +2,18 @@
   text-align: center;
 }
 
+td, tr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+tbody {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

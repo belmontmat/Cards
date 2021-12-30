@@ -178,6 +178,7 @@ function App() {
       <option value="Chilling Reign">Chilling Reign</option>
       <option value="Battle Styles">Battle Styles</option>
       <option value="Rebel Clash">Rebel Clash</option>
+      <option value="Sword & Shield">Sword & Shield</option>
     </select>
       <h1 className="title">Open {seti}</h1>
       <h3>You have ${money}</h3>
