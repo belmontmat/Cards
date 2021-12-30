@@ -146,7 +146,7 @@ function App() {
   function handleSet(e, func) {
     setSet(e.target.value);
   }
-
+  var [isWaiting, isWaitingSet] = React.useState(false);
   var [pack, packSet] = React.useState([]);
   var version = "normal";
   var [seti, setSet] = React.useState("Evolving Skies");
@@ -163,6 +163,7 @@ function App() {
       });
       console.log("net value="+(gain-4));
       moneySet(money+gain-4);
+      isWaitingSet(false);
     }
   }, [pack]);
 
@@ -182,7 +183,7 @@ function App() {
     </select>
       <h1 className="title">Open {seti}</h1>
       <h3>You have ${money}</h3>
-      <button onClick = {async () => {packSet(await breakPack(seti)); firstUpdate.current = false;}}>Open a Pack for $4</button>
+      <button disabled={isWaiting} onClick = {async () => {isWaitingSet(true); packSet(await breakPack(seti)); firstUpdate.current = false;}}>Open a Pack for $4</button>
       <table width="100%">
         <thead>
         </thead>
