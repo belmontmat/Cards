@@ -54,9 +54,21 @@ app.get("/credentials", function(req, res) {
 });
 
 /*
- * The list GET endpoint returns an array of JSON objects representing each pokedex entry.
+ * The GET endpoint returns the quantity of each card the user has in given set
  */
-app.get("/pokedex/list", async function(req, res) {
+app.get("/[user]/collection/[setid]", async function(req, res) {
+  try {
+    res.type("json");
+    let results = await selectAll();
+    res.json({"pokemon": results});
+  } catch (err) {
+    res.status(FILE_ERROR).send(SERVER_ERROR_MSG);
+  }
+});
+/*
+ * The GET endpoint returns the %complete of each set
+ */
+app.get("/[user]/collection", async function(req, res) {
   try {
     res.type("json");
     let results = await selectAll();
@@ -67,9 +79,32 @@ app.get("/pokedex/list", async function(req, res) {
 });
 
 /*
- * The insert POST endpoint adds the given entry to the pokedex. If the given name has already been
- * found a 400 status is sent. If no nickname is provided it will default to all caps of the
- * pokemon's name.
+ * The GET endpoint returns the possible achievements, their completion status and the reward
+ */
+app.get("/[user]/achievements", async function(req, res) {
+  try {
+    res.type("json");
+    let results = await selectAll();
+    res.json({"pokemon": results});
+  } catch (err) {
+    res.status(FILE_ERROR).send(SERVER_ERROR_MSG);
+  }
+});
+
+/*
+ * The GET endpoint returns the users bag (inventory)
+ */
+app.get("/[user]/bag", async function(req, res) {
+  try {
+    res.type("json");
+    let results = await selectAll();
+    res.json({"pokemon": results});
+  } catch (err) {
+    res.status(FILE_ERROR).send(SERVER_ERROR_MSG);
+  }
+});
+/*
+ * The insert POST endpoint adds the card to the user's collection
  */
 app.post("/pokedex/insert", async function(req, res) {
   try {
