@@ -23,6 +23,6 @@ CREATE TABLE CollectTable (
 );
 CREATE TABLE BagTable (
   id INTEGER,
-  bagcontents JSON
+  bagcontents JSON,
   PRIMARY KEY(id)
 );
