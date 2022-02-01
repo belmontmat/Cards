@@ -77,17 +77,13 @@ function App() {
         </thead>
         <tbody>
           {pack.map((data) => {
-            if(data.id.includes("reverse")){
+            if(data.id.includes("Reverse")){
               version = "reverseHolofoil";
-            } else if(data.id.includes("hit")) {
-              if (data.card.rarity.includes("Holo") || data.card.rarity.includes("Rainbow") || data.card.rarity.includes("Ultra") || data.card.rarity.includes("Secret")) {
+            } else if(data.card.rarity.includes("Holo") || data.card.rarity.includes("Rainbow") || data.card.rarity.includes("Ultra") || data.card.rarity.includes("Secret")) {
                 version = "holofoil";
               } else {
                 version = "normal";
               }
-            } else {
-              version = "normal";
-            }
           return (
             <tr key={data.id}>
               <td>

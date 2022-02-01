@@ -10,30 +10,36 @@ export function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
 }
 
-export function addCards(num, rarity, set, pack) {
+export async function addCards(num, rarity, set, pack) {
+  //removes whitespace as session storage perfers
   var trim = rarity.replace(/\s+/g, '');
   var raritySet = JSON.parse(sessionStorage.getItem(set + "-"+trim+"Set"));
   if (raritySet == null) {
     if (rarity !== "Reverse") {
       raritySet = await fetchCards(set, rarity);
     } else {
+      var rareSet = await fetchCards(set, "Rare");
+      sessionStorage.setItem(set + "-RareSet",JSON.stringify(rareSet));
+      var rarehSet = await fetchCards(set, "Rare Holo");
+      sessionStorage.setItem(set + "-RareHoloSet",JSON.stringify(rarehSet));
       raritySet = JSON.parse(sessionStorage.getItem(set + "-CommonSet")).concat(JSON.parse(sessionStorage.getItem(set + "-UncommonSet"))).concat(JSON.parse(sessionStorage.getItem(set + "-RareSet"))).concat(JSON.parse(sessionStorage.getItem(set + "-RareHoloSet")));
     }
-    sessionStorage.setItem(setName + "-"+trim+"Set",JSON.stringify(raritySet));
+    sessionStorage.setItem(set + "-"+trim+"Set",JSON.stringify(raritySet));
   }
   for (var i = 0; i < num; i++) {
+    var cardnames = [];
     var rand = getRandomIntInclusive(0, raritySet.length - 1);
     if(!cardnames.includes(raritySet[rand].id)) {
-      pack[i] = {id:rarity + " " + i,
+      pack.push({id:rarity+ " " + i,
                 card:raritySet[rand]
-      };
+      });
     cardnames.push(raritySet[rand].id);
     } else {
       console.log("duplicate");
       i--;
     }
-    return pack;
   }
+  return pack;
 }
 
 export async function breakPack(setName) {
@@ -56,10 +62,11 @@ export async function breakPack(setName) {
   });
 
   var pack = [];
-  pack = addCards(5, "Common", setName, pack);
-  pack = addCards(3, "Uncommon", setName, pack);
-  pack = addCards(1, "Reverse", setName, pack);
-  pack = addCards(1, hitRarity, setName, pack);
+  pack = await addCards(5, "Common", setName, pack);
+  pack = await addCards(3, "Uncommon", setName, pack);
+  pack = await addCards(1, "Reverse", setName, pack);
+  pack = await addCards(1, hitRarity, setName, pack);
+  console.log(JSON.stringify(pack));
   return pack;
 }
 

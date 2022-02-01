@@ -23,5 +23,8 @@ describe('addCards', () => {
     it('should handle dupes', () => {
 
     });
+    it('should save set info to session storage', () => {
+
+    });
   }
 });
