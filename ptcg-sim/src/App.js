@@ -59,7 +59,6 @@ function App() {
   return (
     <div>
     <label htmlFor="setinput">Choose a set:</label>
-
     <select name="setinput" id="setinput" defaultValue={seti} onChange={handleSet}>
       {Options}
     </select>
