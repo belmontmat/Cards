@@ -42,11 +42,14 @@ export async function addCards(num, rarity, set, pack) {
   return pack;
 }
 
-export async function breakPack(setName) {
-  // THIS IS ONLY FOR MAIN MODERN SETS Ex. Evolving Skies
-
+export function getHitRarity(num){
   // ROLL FOR RARITY(roll 1 to 100 inclusive,[1 to rare]= rare,[rare+1 to rare + rareh] = rare holo,[Σrareh+1 to Σv] = v, [Σv+1 to Σvmax] = vmax, [Σvmax+1 to Σultra] = ultra, [Σultra+1 to Σrainbow] = rainbow,[Σrainbow+1 to Σsecret] = secret)
-  var rarity = getRandomIntInclusive(1, 100);
+  var rarity;
+  if(num === undefined) {
+    rarity = getRandomIntInclusive(0, 99);
+  } else {
+    rarity = num;
+  }
   var sigma = 0;
   var hitRarity = null;
   const rates = Pullrates.Rates;
@@ -60,6 +63,12 @@ export async function breakPack(setName) {
       return true;
     }
   });
+  return hitRarity;
+}
+
+export async function breakPack(setName) {
+  // THIS IS ONLY FOR MAIN MODERN SETS Ex. Evolving Skies
+  var hitRarity = getHitRarity();
 
   var pack = [];
   pack = await addCards(5, "Common", setName, pack);

@@ -3,7 +3,7 @@
   "Rates": [
     {
       "Rarity" :"Rare",
-      "Chance" : 49
+      "Chance" : 50
     },
     {
       "Rarity" :"Rare Holo",
@@ -11,7 +11,7 @@
     },
     {
       "Rarity" :"Rare Holo V",
-      "Chance" : 15
+      "Chance" : 14
     },
     {
       "Rarity" :"Rare Holo VMAX",

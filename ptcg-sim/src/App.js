@@ -3,6 +3,7 @@ import React from "react";
 //import ReactDOM from 'react-dom';
 import "./App.css";
 import {breakPack} from './index.js';
+import Options from './supportedSets.js';
 export default App;
 
 /*
@@ -37,7 +38,7 @@ function App() {
   var [isWaiting, isWaitingSet] = React.useState(false);
   var [pack, packSet] = React.useState([]);
   var version = "normal";
-  var [seti, setSet] = React.useState("Evolving Skies");
+  var [seti, setSet] = React.useState(Options[0].props.value);
   var [money, moneySet] = React.useState(100.0);
   const firstUpdate = React.useRef(true);
 
@@ -60,17 +61,10 @@ function App() {
     <label htmlFor="setinput">Choose a set:</label>
 
     <select name="setinput" id="setinput" defaultValue={seti} onChange={handleSet}>
-      <option value="Evolving Skies">Evolving Skies</option>
-      <option value="Fusion Strike">Fusion Strike</option>
-      <option value="Vivid Voltage">Vivid Voltage</option>
-      <option value="Darkness Ablaze">Darkness Ablaze</option>
-      <option value="Chilling Reign">Chilling Reign</option>
-      <option value="Battle Styles">Battle Styles</option>
-      <option value="Rebel Clash">Rebel Clash</option>
-      <option value="Sword & Shield">Sword & Shield</option>
+      {Options}
     </select>
       <h1 className="title">Open {seti}</h1>
-      <h3>You have ${money}</h3>
+      <h3>You have ${money.toFixed(2)}</h3>
       <button disabled={isWaiting} onClick = {async () => {isWaitingSet(true); packSet(await breakPack(seti)); firstUpdate.current = false;}}>Open a Pack for $4</button>
       <table width="100%">
         <thead>
