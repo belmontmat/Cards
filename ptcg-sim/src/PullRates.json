@@ -1,5 +1,23 @@
 {
   "Set": "Evolving Skies",
+  "Layout": [
+    {
+      "Rarity": "Common",
+      "Amount": 5
+    },
+    {
+      "Rarity": "Uncommon",
+      "Amount": 3
+    },
+    {
+      "Rarity": "Reverse",
+      "Amount": 1
+    },
+    {
+      "Rarity": "Hit",
+      "Amount": 1
+    }
+  ],
   "Rates": [
     {
       "Rarity" :"Rare",

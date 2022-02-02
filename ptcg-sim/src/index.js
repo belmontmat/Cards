@@ -11,7 +11,7 @@ export function getRandomIntInclusive(min, max) {
 }
 
 export async function addCards(num, rarity, set, pack) {
-  //removes whitespace as session storage perfers
+  //removes whitespace as session storage prefers
   var trim = rarity.replace(/\s+/g, '');
   var raritySet = JSON.parse(sessionStorage.getItem(set + "-"+trim+"Set"));
   if (raritySet == null) {
@@ -26,19 +26,22 @@ export async function addCards(num, rarity, set, pack) {
     }
     sessionStorage.setItem(set + "-"+trim+"Set",JSON.stringify(raritySet));
   }
+  var cardnames = [];
   for (var i = 0; i < num; i++) {
-    var cardnames = [];
-    var rand = getRandomIntInclusive(0, raritySet.length - 1);
-    if(!cardnames.includes(raritySet[rand].id)) {
-      pack.push({id:rarity+ " " + i,
-                card:raritySet[rand]
-      });
-    cardnames.push(raritySet[rand].id);
-    } else {
-      console.log("duplicate");
-      i--;
-    }
+    pack = makePack(pack, cardnames, i, raritySet, rarity);
   }
+  return pack;
+}
+
+export function makePack(pack, cardnames, i, raritySet, rarity) {
+  var rand = getRandomIntInclusive(0, raritySet.length - 1);
+  if(!cardnames.includes(raritySet[rand].id)) {
+    pack.push({id:rarity + " " + i, card:raritySet[rand]});
+  } else {
+    console.log("duplicate");
+    makePack(pack, cardnames, i, raritySet, rarity)
+  }
+  cardnames.push(raritySet[rand].id);
   return pack;
 }
 
@@ -67,14 +70,16 @@ export function getHitRarity(num){
 }
 
 export async function breakPack(setName) {
-  // THIS IS ONLY FOR MAIN MODERN SETS Ex. Evolving Skies
-  var hitRarity = getHitRarity();
-
+  const layout = Pullrates.Layout;
   var pack = [];
-  pack = await addCards(5, "Common", setName, pack);
-  pack = await addCards(3, "Uncommon", setName, pack);
-  pack = await addCards(1, "Reverse", setName, pack);
-  pack = await addCards(1, hitRarity, setName, pack);
+  for (const card of layout){
+    if(card.Rarity === "Hit") {
+      var hitRarity = getHitRarity();
+      pack = await addCards(1, hitRarity, setName, pack);
+    } else {
+      pack = await addCards(card.Amount, card.Rarity, setName, pack);
+    }
+  }
   console.log(JSON.stringify(pack));
   return pack;
 }
