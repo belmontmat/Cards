@@ -1,5 +1,5 @@
 // These tests should be testing how the components render
-import {breakPack, getRandomIntInclusive, fetchCards, addCards} from '../index.js';
+import {} from '../index.js';
 
 describe('render', () => {
   //input mock packs

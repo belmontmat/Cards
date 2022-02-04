@@ -4,40 +4,18 @@ import React from "react";
 import "./App.css";
 import {breakPack} from './index.js';
 import Options from './supportedSets.js';
+import PackResults from './packResults.js';
+import ErrorBox from './error.js'
 export default App;
 
-/*
-const PokemonCard = ({ data }) => (
-  <tr>
-    <td>{data.card.tcgplayer.prices.normal.mid}</td>
-    <td>{data.card.images.large}</td>
-  </tr>
-);
 
-PokemonCard.propTypes = {
-  card: PropTypes.shape({
-    id: PropTypes.string,
-    images: PropTypes.shape({
-      large: PropTypes.string,
-    }),
-    tcgplayer: PropTypes.shape({
-      prices: PropTypes.shape({
-        normal: PropTypes.shape({
-          mid: PropTypes.number,
-        }),
-      }),
-    }),
-  }),
-};
-*/
 function App() {
 
   function handleSet(e, func) {
     setSet(e.target.value);
   }
   var [isWaiting, isWaitingSet] = React.useState(false);
-  var [pack, packSet] = React.useState([]);
-  var version = "normal";
+  var [pack, packSet] = React.useState({"data":[],"status":200});
   var [seti, setSet] = React.useState(Options[0].props.value);
   var [money, moneySet] = React.useState(100.0);
   const firstUpdate = React.useRef(true);
@@ -45,49 +23,29 @@ function App() {
   React.useEffect(() => {
     if(!firstUpdate.current) {
       var gain = 0;
-      pack.forEach((item, i) => {
-        if(item.id.includes("reverse")){ gain += item.card.tcgplayer.prices.reverseHolofoil.market;}
-        else if(item.card.rarity.includes("Holo") || item.card.rarity.includes("Rainbow") || item.card.rarity.includes("Ultra") || item.card.rarity.includes("Secret")){gain += item.card.tcgplayer.prices.holofoil.market;}
-        else{gain += item.card.tcgplayer.prices.normal.market;}
-      });
-      console.log("net value="+(gain-4));
-      moneySet(money+gain-4);
+      if(pack.status === 200) {
+        pack.data.forEach((item, i) => {
+          if(item.id.includes("reverse")){ gain += item.card.tcgplayer.prices.reverseHolofoil.market;}
+          else if(item.card.rarity.includes("Holo") || item.card.rarity.includes("Rainbow") || item.card.rarity.includes("Ultra") || item.card.rarity.includes("Secret")){gain += item.card.tcgplayer.prices.holofoil.market;}
+          else{gain += item.card.tcgplayer.prices.normal.market;}
+        });
+        console.log("net value="+(gain-4));
+        moneySet(money+gain-4);
+      }
       isWaitingSet(false);
     }
   }, [pack]);
 
   return (
     <div>
-    <label htmlFor="setinput">Choose a set:</label>
-    <select name="setinput" id="setinput" defaultValue={seti} onChange={handleSet}>
-      {Options}
-    </select>
+      <label htmlFor="setinput">Choose a set:</label>
+      <select name="setinput" id="setinput" defaultValue={seti} onChange={handleSet}>
+        {Options}
+      </select>
       <h1 className="title">Open {seti}</h1>
       <h3>You have ${money.toFixed(2)}</h3>
       <button disabled={isWaiting} onClick = {async () => {isWaitingSet(true); packSet(await breakPack(seti)); firstUpdate.current = false;}}>Open a Pack for $4</button>
-      <table width="100%">
-        <thead>
-        </thead>
-        <tbody>
-          {pack.map((data) => {
-            if(data.id.includes("Reverse")){
-              version = "reverseHolofoil";
-            } else if(data.card.rarity.includes("Holo") || data.card.rarity.includes("Rainbow") || data.card.rarity.includes("Ultra") || data.card.rarity.includes("Secret")) {
-                version = "holofoil";
-              } else {
-                version = "normal";
-              }
-          return (
-            <tr key={data.id}>
-              <td>
-                <p>{data.id}</p>
-                <img alt={data.card.id} src={data.card.images.small}></img>
-                <p>${data.card.tcgplayer.prices[version].market}</p>
-              </td>
-            </tr>
-          )})}
-        </tbody>
-      </table>
+      {pack.status === 200 ? <PackResults pack={pack.data} /> : <ErrorBox code={pack.status} />}
     </div>
   );
 }

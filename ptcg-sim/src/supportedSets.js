@@ -7,7 +7,8 @@ import React from "react";
     <option key={5} value="Chilling Reign">Chilling Reign</option>,
     <option key={6} value="Battle Styles">Battle Styles</option>,
     <option key={7} value="Rebel Clash">Rebel Clash</option>,
-    <option key={8} value="Sword & Shield">Sword & Shield</option>
+    <option key={8} value="Sword & Shield">Sword & Shield</option>,
+    <option key={9} value="This Should Fail">This Should Fail</option>
   ];
 
-export default OptionList
+export default OptionList;

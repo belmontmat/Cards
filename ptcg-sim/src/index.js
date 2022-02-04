@@ -11,26 +11,30 @@ export function getRandomIntInclusive(min, max) {
 }
 
 export async function addCards(num, rarity, set, pack) {
-  //removes whitespace as session storage prefers
-  var trim = rarity.replace(/\s+/g, '');
-  var raritySet = JSON.parse(sessionStorage.getItem(set + "-"+trim+"Set"));
-  if (raritySet == null) {
-    if (rarity !== "Reverse") {
-      raritySet = await fetchCards(set, rarity);
-    } else {
-      var rareSet = await fetchCards(set, "Rare");
-      sessionStorage.setItem(set + "-RareSet",JSON.stringify(rareSet));
-      var rarehSet = await fetchCards(set, "Rare Holo");
-      sessionStorage.setItem(set + "-RareHoloSet",JSON.stringify(rarehSet));
-      raritySet = JSON.parse(sessionStorage.getItem(set + "-CommonSet")).concat(JSON.parse(sessionStorage.getItem(set + "-UncommonSet"))).concat(JSON.parse(sessionStorage.getItem(set + "-RareSet"))).concat(JSON.parse(sessionStorage.getItem(set + "-RareHoloSet")));
+  try {
+    //removes whitespace as session storage prefers
+    var trim = rarity.replace(/\s+/g, '');
+    var raritySet = JSON.parse(sessionStorage.getItem(set + "-"+trim+"Set"));
+    if (raritySet == null) {
+      if (rarity !== "Reverse") {
+        raritySet = await fetchCards(set, rarity);
+      } else {
+        var rareSet = await fetchCards(set, "Rare");
+        sessionStorage.setItem(set + "-RareSet",JSON.stringify(rareSet));
+        var rarehSet = await fetchCards(set, "Rare Holo");
+        sessionStorage.setItem(set + "-RareHoloSet",JSON.stringify(rarehSet));
+        raritySet = JSON.parse(sessionStorage.getItem(set + "-CommonSet")).concat(JSON.parse(sessionStorage.getItem(set + "-UncommonSet"))).concat(JSON.parse(sessionStorage.getItem(set + "-RareSet"))).concat(JSON.parse(sessionStorage.getItem(set + "-RareHoloSet")));
+      }
+      sessionStorage.setItem(set + "-"+trim+"Set",JSON.stringify(raritySet));
     }
-    sessionStorage.setItem(set + "-"+trim+"Set",JSON.stringify(raritySet));
+    var cardnames = [];
+    for (var i = 0; i < num; i++) {
+      pack = makePack(pack, cardnames, i, raritySet, rarity);
+    }
+    return {"data":pack,"status":200};
+  } catch (e) {
+    return {"data":pack,"status":e.message};
   }
-  var cardnames = [];
-  for (var i = 0; i < num; i++) {
-    pack = makePack(pack, cardnames, i, raritySet, rarity);
-  }
-  return pack;
 }
 
 export function makePack(pack, cardnames, i, raritySet, rarity) {
@@ -72,36 +76,37 @@ export function getHitRarity(num){
 export async function breakPack(setName) {
   const layout = Pullrates.Layout;
   var pack = [];
+  var status;
+  var chunk;
   for (const card of layout){
     if(card.Rarity === "Hit") {
       var hitRarity = getHitRarity();
-      pack = await addCards(1, hitRarity, setName, pack);
+      chunk = await addCards(1, hitRarity, setName, pack);
     } else {
-      pack = await addCards(card.Amount, card.Rarity, setName, pack);
+      chunk = await addCards(card.Amount, card.Rarity, setName, pack);
     }
+    pack = chunk.data;
+    status = chunk.status;
   }
-  console.log(JSON.stringify(pack));
-  return pack;
+  return {"data":pack,"status":status};
 }
 
 
 export function fetchCards(setName, rarity) {
   return fetch('https://api.pokemontcg.io/v2/cards?q=!set.name:"'+setName+'" !rarity:"'+rarity+'"')
-    .then(checkStatus)
-    .then(resp => resp.json())
-    .then((responseData) => {
+  .then(resp => {
+    if(!resp.ok) {
+      throw Error(resp.status)
+    } else {
+      return resp.json();
+    }
+  })
+  .then((responseData) => {
     return responseData.data;
     })
-    .catch(console.error);
+  .catch(console.error);
 }
 
-
-function checkStatus(response) {
-  if (!response.ok) {
-    throw Error("Error in request: " + response.statusText);
-  }
-  return response;
-}
 
 ReactDOM.render(
   <React.StrictMode>

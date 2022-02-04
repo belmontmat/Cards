@@ -1,5 +1,5 @@
 // These tests should be testing how the functions that rely on function calls
-import {breakPack, getRandomIntInclusive, fetchCards, addCards} from '../index.js';
+import {breakPack, fetchCards} from '../index.js';
 
 describe('breakPack', () => {
   var options = document.getElementById('setInput').options;

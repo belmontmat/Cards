@@ -1,19 +1,22 @@
 //These should test the internal returned values of functions
-import {breakPack, getRandomIntInclusive, fetchCards, addCards, getHitRarity, makePack} from '../index.js';
+import {getHitRarity, makePack, checkStatus} from '../index.js';
 import Pullrates from "./PullRates.json";
 import Options from './supportedSets.js';
 
 //Test that fetchCards handles all types of responses
-describe('fetchCards', async () => {
+describe('fetchCards', () => {
+  var myBlob = new Blob();
+  var init = { "status" : 200 , "statusText" : "Is Good!" };
+  var myResponse = new Response(myBlob,init);
 
 });
 
-describe('makePack', async () => {
+describe('makePack', () => {
   it('should handle dupes', () => {
 
   });
   it('should add the correct number of cards', () => {
-    
+
   });
   it('should add the correct keys', () => {
 
