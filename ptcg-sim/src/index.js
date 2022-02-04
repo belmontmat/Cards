@@ -94,19 +94,20 @@ export async function breakPack(setName) {
 
 export function fetchCards(setName, rarity) {
   return fetch('https://api.pokemontcg.io/v2/cards?q=!set.name:"'+setName+'" !rarity:"'+rarity+'"')
-  .then(resp => {
-    if(!resp.ok) {
-      throw Error(resp.status)
-    } else {
-      return resp.json();
-    }
-  })
+  .then(checkStatus)
   .then((responseData) => {
     return responseData.data;
     })
   .catch(console.error);
 }
 
+export function checkStatus(resp) {
+  if(!resp.ok) {
+    throw Error(resp.status)
+  } else {
+    return resp.json();
+  }
+}
 
 ReactDOM.render(
   <React.StrictMode>

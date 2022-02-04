@@ -3,8 +3,8 @@ import {getHitRarity, makePack, checkStatus} from '../index.js';
 import Pullrates from "./PullRates.json";
 import Options from './supportedSets.js';
 
-//Test that fetchCards handles all types of responses
-describe('fetchCards', () => {
+//Test that checkResponse handles all types of responses
+describe('checkResponse', () => {
   var myBlob = new Blob();
   var init = { "status" : 200 , "statusText" : "Is Good!" };
   var myResponse = new Response(myBlob,init);
