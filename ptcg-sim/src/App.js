@@ -2,7 +2,7 @@ import React from "react";
 //import PropTypes from "prop-types";
 //import ReactDOM from 'react-dom';
 import "./App.css";
-import {breakPack} from './index.js';
+import {pickPack} from './index.js';
 import Options from './supportedSets.js';
 import PackResults from './packResults.js';
 import ErrorBox from './error.js'
@@ -44,7 +44,7 @@ function App() {
       </select>
       <h1 className="title">Open {seti}</h1>
       <h3>You have ${money.toFixed(2)}</h3>
-      <button disabled={isWaiting} onClick = {async () => {isWaitingSet(true); packSet(await breakPack(seti)); firstUpdate.current = false;}}>Open a Pack for $4</button>
+      <button disabled={isWaiting} onClick = {async () => {isWaitingSet(true); packSet(await pickPack(seti)); firstUpdate.current = false;}}>Open a Pack for $4</button>
       {pack.status === 200 ? <PackResults pack={pack.data} /> : <ErrorBox code={pack.status} />}
     </div>
   );

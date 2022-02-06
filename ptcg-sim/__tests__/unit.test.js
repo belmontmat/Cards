@@ -1,5 +1,5 @@
 //These should test the internal returned values of functions
-import {getHitRarity, makePack, checkStatus} from '../index.js';
+import {getHitRarity, addCard, checkStatus} from '../index.js';
 import Pullrates from "./PullRates.json";
 import Options from './supportedSets.js';
 
@@ -11,15 +11,17 @@ describe('checkResponse', () => {
 
 });
 
-describe('makePack', () => {
+describe('addCard', () => {
+  import "./mockset.js" as MockSet;
+  var pack = addCard([], MockSet, MockSet.rarity, 1);
+  pack = addCard(pack, MockSet, MockSet.rarity, 2);
+  pack = addCard(pack, MockSet, MockSet.rarity, 1);
   it('should handle dupes', () => {
-
-  });
-  it('should add the correct number of cards', () => {
-
+    expect(pack[2].id).toBe("Duplicate");
   });
   it('should add the correct keys', () => {
-
+    expect(pack[0]).toBe("Rare Holo pl1-1");
+    expect(pack[1]).toBe("Common det1-1");
   });
 });
 

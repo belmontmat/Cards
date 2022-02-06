@@ -10,7 +10,7 @@ export function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
 }
 
-export async function addCards(num, rarity, set, pack) {
+export async function breakPack(num, rarity, set, pack) {
   try {
     //removes whitespace as session storage prefers
     var trim = rarity.replace(/\s+/g, '');
@@ -27,9 +27,12 @@ export async function addCards(num, rarity, set, pack) {
       }
       sessionStorage.setItem(set + "-"+trim+"Set",JSON.stringify(raritySet));
     }
-    var cardnames = [];
     for (var i = 0; i < num; i++) {
-      pack = makePack(pack, cardnames, i, raritySet, rarity);
+      var rand = getRandomIntInclusive(0, raritySet.length - 1);
+      pack = addCard(pack, raritySet, rarity, rand);
+      if(pack[i].id === "Duplicate") {
+        i--;
+      }
     }
     return {"data":pack,"status":200};
   } catch (e) {
@@ -37,15 +40,12 @@ export async function addCards(num, rarity, set, pack) {
   }
 }
 
-export function makePack(pack, cardnames, i, raritySet, rarity) {
-  var rand = getRandomIntInclusive(0, raritySet.length - 1);
-  if(!cardnames.includes(raritySet[rand].id)) {
-    pack.push({id:rarity + " " + i, card:raritySet[rand]});
+export function addCard(pack, raritySet, rarity, randNum) {
+  if(pack.filter(obj => obj.card.id === "Duplicate").length === 0) {
+    pack.push({id:rarity + " " + raritySet[randNum].id, card:raritySet[randNum]});
   } else {
-    console.log("duplicate");
-    makePack(pack, cardnames, i, raritySet, rarity)
+    pack.push({id:"Duplicate", card:raritySet[randNum]});
   }
-  cardnames.push(raritySet[rand].id);
   return pack;
 }
 
@@ -73,7 +73,7 @@ export function getHitRarity(num){
   return hitRarity;
 }
 
-export async function breakPack(setName) {
+export async function pickPack(setName) {
   const layout = Pullrates.Layout;
   var pack = [];
   var status;
@@ -81,9 +81,9 @@ export async function breakPack(setName) {
   for (const card of layout){
     if(card.Rarity === "Hit") {
       var hitRarity = getHitRarity();
-      chunk = await addCards(1, hitRarity, setName, pack);
+      chunk = await breakPack(1, hitRarity, setName, pack);
     } else {
-      chunk = await addCards(card.Amount, card.Rarity, setName, pack);
+      chunk = await breakPack(card.Amount, card.Rarity, setName, pack);
     }
     pack = chunk.data;
     status = chunk.status;

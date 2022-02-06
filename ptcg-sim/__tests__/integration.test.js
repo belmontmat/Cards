@@ -1,7 +1,7 @@
 // These tests should be testing how the functions that rely on function calls
-import {breakPack, fetchCards} from '../index.js';
+import {pickPack, fetchCards} from '../index.js';
 
-describe('breakPack', () => {
+describe('pickPack', () => {
   var options = document.getElementById('setInput').options;
   for (var i = 0; i < options.length; i++) {
     const pack = breakPack(options[i]);
