@@ -29,8 +29,9 @@ export async function breakPack(num, rarity, set, pack) {
     }
     for (var i = 0; i < num; i++) {
       var rand = getRandomIntInclusive(0, raritySet.length - 1);
-      pack = addCard(pack, raritySet, rarity, rand);
+      pack.push(addCard(pack,raritySet, rarity, rand));
       if(pack[i].id === "Duplicate") {
+        pack.pop();
         i--;
       }
     }
@@ -41,12 +42,11 @@ export async function breakPack(num, rarity, set, pack) {
 }
 
 export function addCard(pack, raritySet, rarity, randNum) {
-  if(pack.filter(obj => obj.card.id === "Duplicate").length === 0) {
-    pack.push({id:rarity + " " + raritySet[randNum].id, card:raritySet[randNum]});
+  if(pack.filter(obj => obj.card.id === raritySet[randNum].id).length === 0) {
+    return {id:rarity + " " + raritySet[randNum].id, card:raritySet[randNum]};
   } else {
-    pack.push({id:"Duplicate", card:raritySet[randNum]});
+    return {id:"Duplicate", card:raritySet[randNum]};
   }
-  return pack;
 }
 
 export function getHitRarity(num){
